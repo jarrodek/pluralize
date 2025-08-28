@@ -1,12 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import pluralize from './src/pluralize'
-
 /**
  * Standard singular/plural matches.
- *
- * @type {Array}
  */
-const BASIC_TESTS: [string, string][] = [
+export const BASIC_TESTS: [string, string][] = [
   // Uncountables.
   ['firmware', 'firmware'],
   ['fish', 'fish'],
@@ -667,152 +662,31 @@ const BASIC_TESTS: [string, string][] = [
   ['Order2', 'Order2s'],
   ['Work Order2', 'Work Order2s'],
   ['SoundFX2', 'SoundFX2s'],
-  ['oDonald', 'oDonalds']
+  ['oDonald', 'oDonalds'],
 ]
 
 /**
  * Odd plural to singular tests.
- *
- * @type {Array}
  */
-const SINGULAR_TESTS: [string, string][] = [
+export const SINGULAR_TESTS: [string, string][] = [
   ['dingo', 'dingos'],
   ['mango', 'mangoes'],
   ['echo', 'echos'],
   ['ghetto', 'ghettoes'],
   ['nucleus', 'nucleuses'],
   ['bureau', 'bureaux'],
-  ['seraph', 'seraphs']
+  ['seraph', 'seraphs'],
 ]
 
 /**
  * Odd singular to plural tests.
- *
- * @type {Array}
  */
-const PLURAL_TESTS: [string, string][] = [
+export const PLURAL_TESTS: [string, string][] = [
   ['plateaux', 'plateaux'],
   ['axis', 'axes'],
   ['basis', 'bases'],
   ['automatum', 'automata'],
   ['thou', 'you'],
   ['axiS', 'axes'],
-  ['passerby', 'passersby']
+  ['passerby', 'passersby'],
 ]
-
-/**
- * Test suite.
- */
-describe('pluralize', () => {
-  describe('methods', () => {
-    describe('plural', () => {
-      BASIC_TESTS.concat(PLURAL_TESTS).forEach(([singular, plural]) => {
-        it(`${singular} -> ${plural}`, () => {
-          expect(pluralize.plural(singular)).toEqual(plural)
-        })
-      })
-    })
-
-    describe('isPlural', () => {
-      BASIC_TESTS.concat(PLURAL_TESTS).forEach(([_, plural]) => {
-        it(`isPlural(${plural})`, () => {
-          expect(pluralize.isPlural(plural)).toBe(true)
-        })
-      })
-    })
-
-    describe('singular', () => {
-      BASIC_TESTS.concat(SINGULAR_TESTS).forEach(([singular, plural]) => {
-        it(`${plural} -> ${singular}`, () => {
-          expect(pluralize.singular(plural)).toEqual(singular)
-        })
-      })
-    })
-
-    describe('isSingular', () => {
-      BASIC_TESTS.concat(SINGULAR_TESTS).forEach(([singular, _]) => {
-        it(`isSingular(${singular})`, () => {
-          expect(pluralize.isSingular(singular)).toBe(true)
-        })
-      })
-    })
-  })
-
-  describe('automatically convert', () => {
-    describe('plural', () => {
-      BASIC_TESTS.concat(PLURAL_TESTS).forEach(([singular, plural]) => {
-        it(`5 ${plural} -> ${plural}`, () => {
-          expect(pluralize(plural, 5)).toEqual(plural)
-        })
-
-        if (singular !== plural) {
-          it(`5 ${singular} -> ${plural}`, () => {
-            expect(pluralize(singular, 5)).toEqual(plural)
-          })
-        }
-      })
-    })
-
-    describe('singular', () => {
-      BASIC_TESTS.concat(SINGULAR_TESTS).forEach(([singular, plural]) => {
-        it(`1 ${singular} -> ${singular}`, () => {
-          expect(pluralize(singular, 1)).toEqual(singular)
-        })
-
-        if (singular !== plural) {
-          it(`1 ${plural} -> ${singular}`, () => {
-            expect(pluralize(plural, 1)).toEqual(singular)
-          })
-        }
-      })
-    })
-  })
-
-  describe('prepend count', () => {
-    it('plural words', () => {
-      expect(pluralize('test', 5, true)).toEqual('5 tests')
-    })
-
-    it('singular words', () => {
-      expect(pluralize('test', 1, true)).toEqual('1 test')
-    })
-  })
-
-  describe('adding new rules', () => {
-    it('uncountable rules', () => {
-      expect(pluralize('paper')).toEqual('papers')
-      pluralize.addUncountableRule('paper')
-      expect(pluralize('paper')).toEqual('paper')
-    })
-
-    it('should allow new irregular words', () => {
-      expect(pluralize('irregular')).toEqual('irregulars')
-      pluralize.addIrregularRule('irregular', 'regular')
-      expect(pluralize('irregular')).toEqual('regular')
-    })
-
-    it('should allow new plural matching rules', () => {
-      expect(pluralize.plural('regex')).toEqual('regexes')
-      pluralize.addPluralRule(/gex$/i, 'gexii')
-      expect(pluralize.plural('regex')).toEqual('regexii')
-    })
-
-    it('should allow new singular matching rules', () => {
-      expect(pluralize.singular('singles')).toEqual('single')
-      pluralize.addSingularRule(/singles$/, 'singular')
-      expect(pluralize.singular('singles')).toEqual('singular')
-    })
-
-    it('should allow new plural matching rules to be strings', () => {
-      expect(pluralize.plural('person')).toEqual('people')
-      pluralize.addPluralRule('person', 'peeps')
-      expect(pluralize.plural('person')).toEqual('peeps')
-    })
-
-    it('should allow new singular matching rules to be strings', () => {
-      expect(pluralize.singular('mornings')).toEqual('morning')
-      pluralize.addSingularRule('mornings', 'suck')
-      expect(pluralize.singular('mornings')).toEqual('suck')
-    })
-  })
-})

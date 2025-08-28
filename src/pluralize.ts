@@ -1,15 +1,96 @@
 // Type definitions for pluralize
 
-interface Pluralize {
-  (word: string, count?: number, inclusive?: boolean): string;
-  plural: (word: string) => string;
-  isPlural: (word: string) => boolean;
-  singular: (word: string) => string;
-  isSingular: (word: string) => boolean;
-  addPluralRule: (rule: string | RegExp, replacement: string) => void;
-  addSingularRule: (rule: string | RegExp, replacement: string) => void;
-  addUncountableRule: (word: string | RegExp) => void;
-  addIrregularRule: (single: string, plural: string) => void;
+export interface Pluralize {
+  (word: string, count?: number, inclusive?: boolean): string
+  /**
+   * Returns the plural form of a word.
+   *
+   * @param word The word to pluralize.
+   * @returns The plural form of the word.
+   *
+   * @example
+   * pluralize.plural('person') // "people"
+   * pluralize.plural('bus') // "buses"
+   */
+  plural: (word: string) => string
+  /**
+   * Checks if a word is plural.
+   *
+   * @param word The word to check.
+   * @returns True if the word is plural, false otherwise.
+   *
+   * @example
+   * pluralize.isPlural('dogs') // true
+   * pluralize.isPlural('dog') // false
+   */
+  isPlural: (word: string) => boolean
+  /**
+   * Returns the singular form of a word.
+   *
+   * @param word The word to singularize.
+   * @returns The singular form of the word.
+   *
+   * @example
+   * pluralize.singular('geese') // "goose"
+   * pluralize.singular('cars') // "car"
+   */
+  singular: (word: string) => string
+  /**
+   * Checks if a word is singular.
+   *
+   * @param word The word to check.
+   * @returns True if the word is singular, false otherwise.
+   *
+   * @example
+   * pluralize.isSingular('dog') // true
+   * pluralize.isSingular('dogs') // false
+   */
+  isSingular: (word: string) => boolean
+  /**
+   * Adds a custom pluralization rule.
+   *
+   * @param rule A string or RegExp to match words.
+   * @param replacement The replacement string for the plural form.
+   *
+   * @example
+   * pluralize.addPluralRule(/quiz$/i, 'quizzes')
+   * pluralize.plural('quiz') // "quizzes"
+   */
+  addPluralRule: (rule: string | RegExp, replacement: string) => void
+  /**
+   * Adds a custom singularization rule.
+   *
+   * @param rule A string or RegExp to match words.
+   * @param replacement The replacement string for the singular form.
+   *
+   * @example
+   * pluralize.addSingularRule(/quizzes$/i, 'quiz')
+   * pluralize.singular('quizzes') // "quiz"
+   */
+  addSingularRule: (rule: string | RegExp, replacement: string) => void
+  /**
+   * Marks a word as uncountable (no singular/plural distinction).
+   *
+   * @param word The word or RegExp to mark as uncountable.
+   *
+   * @example
+   * pluralize.addUncountableRule('sheep')
+   * pluralize.plural('sheep') // "sheep"
+   * pluralize.singular('sheep') // "sheep"
+   */
+  addUncountableRule: (word: string | RegExp) => void
+  /**
+   * Adds an irregular word mapping.
+   *
+   * @param single The singular form of the word.
+   * @param plural The plural form of the word.
+   *
+   * @example
+   * pluralize.addIrregularRule('person', 'people')
+   * pluralize.plural('person') // "people"
+   * pluralize.singular('people') // "person"
+   */
+  addIrregularRule: (single: string, plural: string) => void
 }
 
 // Rule storage - pluralize and singularize need to be run sequentially,
@@ -22,11 +103,8 @@ const irregularSingles: { [key: string]: string } = {}
 
 /**
  * Sanitize a pluralization rule to a usable regular expression.
- *
- * @param  {(RegExp|string)} rule
- * @return {RegExp}
  */
-function sanitizeRule (rule: RegExp | string) {
+function sanitizeRule(rule: RegExp | string) {
   if (typeof rule === 'string') {
     return new RegExp('^' + rule + '$', 'i')
   }
@@ -37,12 +115,8 @@ function sanitizeRule (rule: RegExp | string) {
 /**
  * Pass in a word token to produce a function that can replicate the case on
  * another word.
- *
- * @param  {string}   word
- * @param  {string}   token
- * @return {Function}
  */
-function restoreCase (word: string, token: string) {
+function restoreCase(word: string, token: string) {
   // Tokens are an exact match.
   if (word === token) return token
 
@@ -63,13 +137,8 @@ function restoreCase (word: string, token: string) {
 
 /**
  * Interpolate a regexp string.
- *
- * @param  {string} str
- * @param  {Array}  args
- * @return {string}
  */
-// eslint-disable-next-line prefer-rest-params
-function interpolate (str: string, args: IArguments) {
+function interpolate(str: string, args: IArguments) {
   return str.replace(/\$(\d{1,2})/g, function (match, index) {
     return args[index] || ''
   })
@@ -77,13 +146,8 @@ function interpolate (str: string, args: IArguments) {
 
 /**
  * Replace a word using a rule.
- *
- * @param  {string} word
- * @param  {Array}  rule
- * @return {string}
  */
-// eslint-disable-next-line prefer-rest-params
-function replace (word: string, rule: [RegExp, string]) {
+function replace(word: string, rule: [RegExp, string]) {
   return word.replace(rule[0], function (match, index) {
     const result = interpolate(rule[1], arguments)
 
@@ -97,13 +161,8 @@ function replace (word: string, rule: [RegExp, string]) {
 
 /**
  * Sanitize a word by passing in the word and sanitization rules.
- *
- * @param  {string}   token
- * @param  {string}   word
- * @param  {Array}    rules
- * @return {string}
  */
-function sanitizeWord (token: string, word: string, rules: [RegExp, string][]) {
+function sanitizeWord(token: string, word: string, rules: [RegExp, string][]) {
   // Empty string or doesn't need fixing.
   if (!token.length || Object.prototype.hasOwnProperty.call(uncountables, token)) {
     return word
@@ -123,13 +182,8 @@ function sanitizeWord (token: string, word: string, rules: [RegExp, string][]) {
 
 /**
  * Replace a word with the updated word.
- *
- * @param  {Object}   replaceMap
- * @param  {Object}   keepMap
- * @param  {Array}    rules
- * @return {Function}
  */
-function replaceWord (replaceMap: Record<string, string>, keepMap: Record<string, string>, rules: [RegExp, string][]) {
+function replaceWord(replaceMap: Record<string, string>, keepMap: Record<string, string>, rules: [RegExp, string][]) {
   return function (word: string) {
     // Get the correct token and case restoration functions.
     const token = word.toLowerCase()
@@ -152,7 +206,7 @@ function replaceWord (replaceMap: Record<string, string>, keepMap: Record<string
 /**
  * Check if a word is part of the map.
  */
-function checkWord (replaceMap: Record<string, string>, keepMap: Record<string, string>, rules: [RegExp, string][]) {
+function checkWord(replaceMap: Record<string, string>, keepMap: Record<string, string>, rules: [RegExp, string][]) {
   return function (word: string) {
     const token = word.toLowerCase()
 
@@ -166,101 +220,134 @@ function checkWord (replaceMap: Record<string, string>, keepMap: Record<string, 
 /**
  * Pluralize or singularize a word based on the passed in count.
  *
- * @param  {string}  word      The word to pluralize
- * @param  {number}  count     How many of the word exist
- * @param  {boolean} inclusive Whether to prefix with the number (e.g. 3 ducks)
- * @return {string}
+ * @param word The word to pluralize or singularize.
+ * @param count Optional. The number of items. If 1, returns singular; otherwise plural.
+ * @param inclusive Optional. If true, prefixes the result with the count (e.g., "3 ducks").
+ * @returns The pluralized or singularized word, optionally prefixed by the count.
+ *
+ * @example
+ * pluralize('cat') // "cats"
+ * pluralize('cat', 1) // "cat"
+ * pluralize('cat', 2) // "cats"
+ * pluralize('cat', 2, true) // "2 cats"
+ * pluralize('child', 1, true) // "1 child"
+ * pluralize('child', 3, true) // "3 children"
  */
 const pluralize = function (word: string, count?: number, inclusive?: boolean) {
-  const pluralized = count === 1
-    ? pluralize.singular(word)
-    : pluralize.plural(word)
-
+  const pluralized = count === 1 ? pluralize.singular(word) : pluralize.plural(word)
   return (inclusive ? count + ' ' : '') + pluralized
 } as Pluralize
 
 /**
- * Pluralize a word.
+ * Returns the plural form of a word.
  *
- * @type {Function}
+ * @param word The word to pluralize.
+ * @returns The plural form of the word.
+ *
+ * @example
+ * pluralize.plural('person') // "people"
+ * pluralize.plural('bus') // "buses"
  */
-pluralize.plural = replaceWord(
-  irregularSingles, irregularPlurals, pluralRules
-)
+pluralize.plural = replaceWord(irregularSingles, irregularPlurals, pluralRules)
 
 /**
- * Check if a word is plural.
+ * Checks if a word is plural.
  *
- * @type {Function}
+ * @param word The word to check.
+ * @returns True if the word is plural, false otherwise.
+ *
+ * @example
+ * pluralize.isPlural('dogs') // true
+ * pluralize.isPlural('dog') // false
  */
-pluralize.isPlural = checkWord(
-  irregularSingles, irregularPlurals, pluralRules
-)
+pluralize.isPlural = checkWord(irregularSingles, irregularPlurals, pluralRules)
 
 /**
- * Singularize a word.
+ * Returns the singular form of a word.
  *
- * @type {Function}
+ * @param word The word to singularize.
+ * @returns The singular form of the word.
+ *
+ * @example
+ * pluralize.singular('geese') // "goose"
+ * pluralize.singular('cars') // "car"
  */
-pluralize.singular = replaceWord(
-  irregularPlurals, irregularSingles, singularRules
-)
+pluralize.singular = replaceWord(irregularPlurals, irregularSingles, singularRules)
 
 /**
- * Check if a word is singular.
+ * Checks if a word is singular.
  *
- * @type {Function}
+ * @param word The word to check.
+ * @returns True if the word is singular, false otherwise.
+ *
+ * @example
+ * pluralize.isSingular('dog') // true
+ * pluralize.isSingular('dogs') // false
  */
-pluralize.isSingular = checkWord(
-  irregularPlurals, irregularSingles, singularRules
-)
+pluralize.isSingular = checkWord(irregularPlurals, irregularSingles, singularRules)
 
 /**
- * Add a pluralization rule to the collection.
+ * Adds a custom pluralization rule.
  *
- * @param {(string|RegExp)} rule
- * @param {string}          replacement
+ * @param rule A string or RegExp to match words.
+ * @param replacement The replacement string for the plural form.
+ *
+ * @example
+ * pluralize.addPluralRule(/quiz$/i, 'quizzes')
+ * pluralize.plural('quiz') // "quizzes"
  */
 pluralize.addPluralRule = function (rule: string | RegExp, replacement: string) {
   pluralRules.push([sanitizeRule(rule), replacement])
 }
 
 /**
- * Add a singularization rule to the collection.
+ * Adds a custom singularization rule.
  *
- * @param {(string|RegExp)} rule
- * @param {string}          replacement
+ * @param rule A string or RegExp to match words.
+ * @param replacement The replacement string for the singular form.
+ *
+ * @example
+ * pluralize.addSingularRule(/quizzes$/i, 'quiz')
+ * pluralize.singular('quizzes') // "quiz"
  */
 pluralize.addSingularRule = function (rule: string | RegExp, replacement: string) {
   singularRules.push([sanitizeRule(rule), replacement])
 }
 
 /**
- * Add an uncountable word rule.
+ * Marks a word as uncountable (no singular/plural distinction).
  *
- * @param {(string|RegExp)} word
+ * @param word The word or RegExp to mark as uncountable.
+ *
+ * @example
+ * pluralize.addUncountableRule('sheep')
+ * pluralize.plural('sheep') // "sheep"
+ * pluralize.singular('sheep') // "sheep"
  */
 pluralize.addUncountableRule = function (word: string | RegExp) {
   if (typeof word === 'string') {
     uncountables[word.toLowerCase()] = true
     return
   }
-
   // Set singular and plural references for the word.
   pluralize.addPluralRule(word, '$0')
   pluralize.addSingularRule(word, '$0')
 }
 
 /**
- * Add an irregular word definition.
+ * Adds an irregular word mapping.
  *
- * @param {string} single
- * @param {string} plural
+ * @param single The singular form of the word.
+ * @param plural The plural form of the word.
+ *
+ * @example
+ * pluralize.addIrregularRule('person', 'people')
+ * pluralize.plural('person') // "people"
+ * pluralize.singular('people') // "person"
  */
 pluralize.addIrregularRule = function (single: string, plural: string) {
   plural = plural.toLowerCase()
   single = single.toLowerCase()
-
   irregularSingles[single] = plural
   irregularPlurals[plural] = single
 }
@@ -325,7 +412,7 @@ pluralize.addIrregularRule = function (single: string, plural: string) {
   ['groove', 'grooves'],
   ['pickaxe', 'pickaxes'],
   ['passerby', 'passersby'],
-  ['canvas', 'canvases']
+  ['canvas', 'canvases'],
 ].forEach(function (rule) {
   return pluralize.addIrregularRule(rule[0], rule[1])
 })
@@ -346,7 +433,10 @@ pluralize.addIrregularRule = function (single: string, plural: string) {
   [/(alumn|alg|vertebr)(?:a|ae)$/i, '$1ae'],
   [/(seraph|cherub)(?:im)?$/i, '$1im'],
   [/(her|at|gr)o$/i, '$1oes'],
-  [/(agend|addend|millenni|dat|extrem|bacteri|desiderat|strat|candelabr|errat|ov|symposi|curricul|automat|quor)(?:a|um)$/i, '$1a'],
+  [
+    /(agend|addend|millenni|dat|extrem|bacteri|desiderat|strat|candelabr|errat|ov|symposi|curricul|automat|quor)(?:a|um)$/i,
+    '$1a',
+  ],
   [/(apheli|hyperbat|periheli|asyndet|noumen|phenomen|criteri|organ|prolegomen|hedr|automat)(?:a|on)$/i, '$1a'],
   [/sis$/i, 'ses'],
   [/(?:(kni|wi|li)fe|(ar|l|ea|eo|oa|hoo)f)$/i, '$1$2ves'],
@@ -359,9 +449,9 @@ pluralize.addIrregularRule = function (single: string, plural: string) {
   [/(child)(?:ren)?$/i, '$1ren'],
   [/eaux$/i, '$0'],
   [/m[ae]n$/i, 'men'],
-  ['thou', 'you']
+  ['thou', 'you'],
 ].forEach(function (rule) {
-  return pluralize.addPluralRule(rule[0] as (RegExp | string), rule[1] as string)
+  return pluralize.addPluralRule(rule[0] as RegExp | string, rule[1] as string)
 })
 
 /**
@@ -374,7 +464,10 @@ pluralize.addIrregularRule = function (single: string, plural: string) {
   [/(ar|(?:wo|[ae])l|[eo][ao])ves$/i, '$1f'],
   [/ies$/i, 'y'],
   [/(dg|ss|ois|lk|ok|wn|mb|th|ch|ec|oal|is|ck|ix|sser|ts|wb)ies$/i, '$1ie'],
-  [/\b(l|(?:neck|cross|hog|aun)?t|coll|faer|food|gen|goon|group|hipp|junk|vegg|(?:pork)?p|charl|calor|cut)ies$/i, '$1ie'],
+  [
+    /\b(l|(?:neck|cross|hog|aun)?t|coll|faer|food|gen|goon|group|hipp|junk|vegg|(?:pork)?p|charl|calor|cut)ies$/i,
+    '$1ie',
+  ],
   [/\b(mon|smil)ies$/i, '$1ey'],
   [/\b((?:tit)?m|l)ice$/i, '$1ouse'],
   [/(seraph|cherub)im$/i, '$1'],
@@ -391,9 +484,9 @@ pluralize.addIrregularRule = function (single: string, plural: string) {
   [/(pe)(rson|ople)$/i, '$1rson'],
   [/(child)ren$/i, '$1'],
   [/(eau)x?$/i, '$1'],
-  [/men$/i, 'man']
+  [/men$/i, 'man'],
 ].forEach(function (rule) {
-  return pluralize.addSingularRule(rule[0] as (RegExp | string), rule[1] as string)
+  return pluralize.addSingularRule(rule[0] as RegExp | string, rule[1] as string)
 })
 
 /**
@@ -502,7 +595,7 @@ pluralize.addIrregularRule = function (single: string, plural: string) {
   /measles$/i,
   /o[iu]s$/i, // "carnivorous"
   /pox$/i, // "chickpox", "smallpox"
-  /sheep$/i
+  /sheep$/i,
 ].forEach(pluralize.addUncountableRule)
 
 export default pluralize

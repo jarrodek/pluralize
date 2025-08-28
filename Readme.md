@@ -1,100 +1,114 @@
-# Pluralize
 
-[![NPM version][npm-image]][npm-url]
-[![NPM downloads][downloads-image]][downloads-url]
-[![Build status][travis-image]][travis-url]
-[![Test coverage][coveralls-image]][coveralls-url]
-![File Size][filesize-url]
-[![CDNJS][cdnjs-image]][cdnjs-url]
+# Pluralize (ES Fork)
 
-> Pluralize and singularize any word.
+> Modern, ES-ready fork of the original [pluralize](https://github.com/blakeembrey/pluralize) library. The original is no longer maintained—this fork is actively updated and supports ES modules out of the box.
+
+Pluralize is a robust TypeScript library for pluralizing and singularizing English (and some Unicode) words. It is designed for developers who need reliable inflection, custom rule extension, and runtime flexibility.
 
 ## Installation
 
-```
-npm install pluralize --save
-yarn add pluralize
-bower install pluralize --save
-```
-
-### Node
-
-```javascript
-var pluralize = require('pluralize')
+```bash
+npm install @jarrodek/pluralize
+# or
+yarn add @jarrodek/pluralize
 ```
 
-### AMD
+### ES Module Usage
 
-```javascript
-define(function (require, exports, module) {
-  var pluralize = require('pluralize')
-})
+```js
+import pluralize from '@jarrodek/pluralize';
 ```
 
-### `<script>` tag
+### CommonJS Usage
+
+```js
+const pluralize = require('@jarrodek/pluralize');
+```
+
+### Browser
 
 ```html
-<script src="pluralize.js"></script>
+<!-- Stop polluting the global namespace! -->
 ```
 
-## Why?
+## Why Pluralize?
 
-This module uses a pre-defined list of rules, applied in order, to singularize or pluralize a given word. There are many cases where this is useful, such as any automation based on user input. For applications where the word(s) are known ahead of time, you can use a simple ternary (or function) which would be a much lighter alternative.
+- **Actively maintained fork**: The original library is unmaintained; this fork is modernized and ES module compatible.
+- **TypeScript-first**: Full type definitions and modern build pipeline.
+- **Extensible**: Add custom plural/singular/irregular/uncountable rules at runtime.
+- **Reliable inflection**: Handles edge cases, Unicode, and irregular forms.
 
-## Usage
+## API & Examples
 
-* `word: string` The word to pluralize
-* `count: number` How many of the word exist
-* `inclusive: boolean` Whether to prefix with the number (e.g. 3 ducks)
+### Basic Usage
 
-Examples:
+```js
+pluralize('test') // "tests"
+pluralize('test', 1) // "test"
+pluralize('test', 5) // "tests"
+pluralize('test', 1, true) // "1 test"
+pluralize('test', 5, true) // "5 tests"
+pluralize('蘋果', 2, true) // "2 蘋果"
+```
 
-```javascript
-pluralize('test') //=> "tests"
-pluralize('test', 0) //=> "tests"
-pluralize('test', 1) //=> "test"
-pluralize('test', 5) //=> "tests"
-pluralize('test', 1, true) //=> "1 test"
-pluralize('test', 5, true) //=> "5 tests"
-pluralize('蘋果', 2, true) //=> "2 蘋果"
+### Advanced API
 
-// Example of new plural rule:
-pluralize.plural('regex') //=> "regexes"
+#### Pluralize a word
+
+```js
+pluralize.plural('person') // "people"
+pluralize.plural('bus') // "buses"
+```
+
+#### Singularize a word
+
+```js
+pluralize.singular('geese') // "goose"
+pluralize.singular('cars') // "car"
+```
+
+#### Check if a word is plural or singular
+
+```js
+pluralize.isPlural('dogs') // true
+pluralize.isSingular('dog') // true
+```
+
+#### Add custom rules at runtime
+
+```js
 pluralize.addPluralRule(/gex$/i, 'gexii')
-pluralize.plural('regex') //=> "regexii"
+pluralize.plural('regex') // "regexii"
 
-// Example of new singular rule:
-pluralize.singular('singles') //=> "single"
 pluralize.addSingularRule(/singles$/i, 'singular')
-pluralize.singular('singles') //=> "singular"
+pluralize.singular('singles') // "singular"
 
-// Example of new irregular rule, e.g. "I" -> "we":
-pluralize.plural('irregular') //=> "irregulars"
-pluralize.addIrregularRule('irregular', 'regular')
-pluralize.plural('irregular') //=> "regular"
+pluralize.addIrregularRule('person', 'people')
+pluralize.plural('person') // "people"
+pluralize.singular('people') // "person"
 
-// Example of uncountable rule (rules without singular/plural in context):
-pluralize.plural('paper') //=> "papers"
-pluralize.addUncountableRule('paper')
-pluralize.plural('paper') //=> "paper"
-
-// Example of asking whether a word looks singular or plural:
-pluralize.isPlural('test') //=> false
-pluralize.isSingular('test') //=> true
+pluralize.addUncountableRule('sheep')
+pluralize.plural('sheep') // "sheep"
+pluralize.singular('sheep') // "sheep"
 ```
+
+## Use Cases
+
+- **UI/UX:** Display item counts: "1 file", "2 files".
+- **Natural Language Processing:** Normalize user input for search, categorization, or reporting.
+- **Domain Extensions:** Add custom inflection rules for medical, legal, or technical vocabulary.
+- **Internationalization:** Handles Unicode and non-English words for basic pluralization.
+
+## Extending & Testing
+
+- Add new rules using the API methods above.
+- All new rules and API extensions should be covered by unit tests in `tests/unit/`.
+- See `tests/unit/methods.spec.ts` for test patterns.
+
+## Maintainers & Fork Status
+
+This is a fork of [blakeembrey/pluralize](https://github.com/blakeembrey/pluralize), which is no longer maintained. This fork is actively updated, ES module compatible, and modernized for developer use.
 
 ## License
 
 MIT
-
-[npm-image]: https://img.shields.io/npm/v/pluralize.svg?style=flat
-[npm-url]: https://npmjs.org/package/pluralize
-[downloads-image]: https://img.shields.io/npm/dm/pluralize.svg?style=flat
-[downloads-url]: https://npmjs.org/package/pluralize
-[travis-image]: https://img.shields.io/travis/blakeembrey/pluralize.svg?style=flat
-[travis-url]: https://travis-ci.org/blakeembrey/pluralize
-[coveralls-image]: https://img.shields.io/coveralls/blakeembrey/pluralize.svg?style=flat
-[coveralls-url]: https://coveralls.io/r/blakeembrey/pluralize?branch=master
-[filesize-url]: https://img.shields.io/github/size/blakeembrey/pluralize/pluralize.js.svg?style=flat
-[cdnjs-image]: https://img.shields.io/cdnjs/v/pluralize.svg
-[cdnjs-url]: https://cdnjs.com/libraries/pluralize
