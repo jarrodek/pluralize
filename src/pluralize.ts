@@ -128,7 +128,7 @@ function restoreCase(word: string, token: string) {
 
   // Title cased words. E.g. "Title".
   if (word[0] === word[0].toUpperCase()) {
-    return token.charAt(0).toUpperCase() + token.substr(1).toLowerCase()
+    return token.charAt(0).toUpperCase() + token.slice(1).toLowerCase()
   }
 
   // Lower cased words. E.g. "test".
@@ -138,7 +138,7 @@ function restoreCase(word: string, token: string) {
 /**
  * Interpolate a regexp string.
  */
-function interpolate(str: string, args: IArguments) {
+function interpolate(str: string, args: ArrayLike<string>) {
   return str.replace(/\$(\d{1,2})/g, function (match, index) {
     return args[index] || ''
   })
@@ -164,7 +164,7 @@ function replace(word: string, rule: [RegExp, string]) {
  */
 function sanitizeWord(token: string, word: string, rules: [RegExp, string][]) {
   // Empty string or doesn't need fixing.
-  if (!token.length || Object.prototype.hasOwnProperty.call(uncountables, token)) {
+  if (!token.length || Object.hasOwn(uncountables, token)) {
     return word
   }
 
@@ -414,7 +414,7 @@ pluralize.addIrregularRule = function (single: string, plural: string) {
   ['passerby', 'passersby'],
   ['canvas', 'canvases'],
 ].forEach(function (rule) {
-  return pluralize.addIrregularRule(rule[0], rule[1])
+  pluralize.addIrregularRule(rule[0], rule[1])
 })
 
 /**
@@ -451,7 +451,7 @@ pluralize.addIrregularRule = function (single: string, plural: string) {
   [/m[ae]n$/i, 'men'],
   ['thou', 'you'],
 ].forEach(function (rule) {
-  return pluralize.addPluralRule(rule[0] as RegExp | string, rule[1] as string)
+  pluralize.addPluralRule(rule[0] as RegExp | string, rule[1] as string)
 })
 
 /**
@@ -486,7 +486,7 @@ pluralize.addIrregularRule = function (single: string, plural: string) {
   [/(eau)x?$/i, '$1'],
   [/men$/i, 'man'],
 ].forEach(function (rule) {
-  return pluralize.addSingularRule(rule[0] as RegExp | string, rule[1] as string)
+  pluralize.addSingularRule(rule[0] as RegExp | string, rule[1] as string)
 })
 
 /**

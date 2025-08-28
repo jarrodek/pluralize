@@ -116,11 +116,6 @@
     "typescript": "^5.9.2",
     "wireit": "^0.14.0"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
     "*.ts": [
       "eslint --fix"
