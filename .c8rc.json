@@ -1,0 +1,7 @@
+{
+  "clean": true,
+  "exclude": [
+    "bin/**",
+    "tests/**"
+  ]
+}
